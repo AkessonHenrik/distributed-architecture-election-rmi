@@ -3,16 +3,27 @@ import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
 
+/**
+ * @author Henrik Akesson
+ * @author Fabien Salathe
+ */
 public class RMIServer extends UnicastRemoteObject implements RMIServerInterface {
     private int id;
+    private Node parent;
 
-    RMIServer(int id) throws RemoteException {
+    RMIServer(int id, Node parent) throws RemoteException {
         this.id = id;
+        this.parent = parent;
     }
 
     @Override
     public String getMessage(int clientId) throws RemoteException {
         return "Client " + clientId + " has called Server " + id;
+    }
+
+    @Override
+    public void elect(int id, int apt) throws RemoteException {
+        parent.elect(id, apt);
     }
 
     void start() throws MalformedURLException, RemoteException {

@@ -1,5 +1,9 @@
 import java.rmi.RemoteException;
 
+/**
+ * @author Henrik Akesson
+ * @author Fabien Salathe
+ */
 public class Main {
     public static void main(String... args) throws RemoteException {
 
