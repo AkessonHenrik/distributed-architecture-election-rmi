@@ -1,6 +1,5 @@
 import java.net.MalformedURLException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
+import java.rmi.*;
 
 /**
  * @author Henrik Akesson
@@ -15,7 +14,7 @@ public class Main {
 
         // Let time for Servers to start correctly
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

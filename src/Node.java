@@ -1,8 +1,7 @@
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 class Node {
     private static int numberOfNodes = 0;
@@ -48,7 +47,7 @@ class Node {
                 electedNodeAptitude = apt;
                 this.apt++;
             }
-            Thread.sleep(1000);
+            Thread.sleep(100);
             this.rmiClient.transmit(electedNode, electedNodeAptitude);
         }
     }

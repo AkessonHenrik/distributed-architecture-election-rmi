@@ -1,7 +1,9 @@
 import java.rmi.*;
 
+/**
+ * @author Henrik Akesson
+ * @author Fabien Salathe
+ */
 public interface RMIServerInterface extends Remote {
-    String getMessage(int clientId) throws RemoteException;
-
     void elect(int id, int apt) throws RemoteException, InterruptedException;
 }

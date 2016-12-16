@@ -1,9 +1,6 @@
 import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.rmi.*;
+import java.util.logging.*;
 
 /**
  * @author Henrik Akesson

@@ -2,8 +2,7 @@ import java.net.MalformedURLException;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 /**
  * @author Henrik Akesson
@@ -27,11 +26,6 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
         // Bind this object instance to the name "RmiServer"
         Naming.rebind("localhost/RMIServer" + id, this);
         Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "PeerServer bound in registry " + "localhost/RMIServer" + id);
-    }
-
-    @Override
-    public String getMessage(int clientId) throws RemoteException {
-        return "Client " + clientId + " has called Server " + id;
     }
 
     @Override
