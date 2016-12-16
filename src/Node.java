@@ -3,58 +3,89 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 class Node {
-    private static int numberOfNodes = 0;
+    private int numberOfNodes = 0;
     private final int id;
     private int apt;
     private RMIClient rmiClient;
     private RMIServer rmiServer;
 
-    Node() throws RemoteException {
-        this.id = numberOfNodes++;
-        this.rmiServer = new RMIServer(this.id, this);
+    Node(int id, int numberOfNodes) throws RemoteException, MalformedURLException, NotBoundException {
+        this.id = id;
+        this.numberOfNodes = numberOfNodes;
+        this.rmiServer = new RMIServer(id, this);
         this.rmiClient = new RMIClient(this);
         System.out.println("This id is " + id);
         System.out.println("Current number of Nodes: " + numberOfNodes);
     }
-    public static int getNumberOfNodes() {
+
+    public int getNumberOfNodes() {
         return numberOfNodes;
     }
+
     public int getId() {
         return this.id;
     }
-    void elect(int id, int apt) {
+
+    void elect(int id, int apt) throws RemoteException, InterruptedException {
+
+        int electedNode, electedNodeAptitude;
+
         System.out.println("Elect in node " + this.id);
-        if(this.apt > apt) {
-            // This node has a higher aptitude
 
-            // Transmit to next node
-
-            this.apt = 0;
-
-        } else if (this.apt == apt) {
-            // Equal aptitudes, choice will be made according to id difference
-            if(this.id > id) {
-                // this node is elected
+        // Check if this node has been elected by all other nodes, full circle
+        if (this.id == id) {
+            electedNode = -1;
+            electedNodeAptitude = -1;
+            System.out.println("Full circle, node " + this.id + " has been elected");
+        } else {
+            if (this.apt > apt) {
+                System.out.println("NODE " + this.id + ":This apt = " + this.apt + " is > " + apt + " of node " + id);
+                System.out.println("Node " + this.id + " is elected");
+                electedNode = this.id;
+                electedNodeAptitude = this.apt;
+                // This node has a higher aptitude
 
                 // Transmit to next node
 
                 this.apt = 0;
-            } else {
-                // caller node is elected
+
+            } else if (this.apt == apt) {
+                System.out.println("NODE " + this.id + ": This apt = " + this.apt + " is == " + apt + " of node " + id);
+                // Equal aptitudes, choice will be made according to id difference
+                if (this.id > id) {
+                    // this node is elected
+                    System.out.println("Node " + this.id + " is elected");
+
+                    // Transmit to next node
+                    electedNode = this.id;
+                    electedNodeAptitude = this.apt;
+
+                    this.apt = 0;
+                } else {
+                    // caller node is elected
+                    System.out.println("Node " + id + " is elected");
+                    electedNode = id;
+                    electedNodeAptitude = apt;
+
+                    // Transmit to next node
+
+                    this.apt++;
+                }
+
+            } else { // this.apt < apt
+                System.out.println("NODE " + this.id + ":This apt = " + this.apt + " is < " + apt + " of node " + id);
+                // Caller node has a higher aptitude
+                System.out.println("Node " + id + " is elected");
+                electedNode = id;
+                electedNodeAptitude = apt;
 
                 // Transmit to next node
 
                 this.apt++;
             }
-
-        } else { // this.apt < apt
-            // Caller node has a higher aptitude
-
-            // Transmit to next node
-
-            this.apt++;
+            Thread.sleep(1000);
+            this.rmiClient.transmit(electedNode, electedNodeAptitude);
         }
-        this.rmiClient.transmit();
     }
 
     void startServer() {
@@ -70,8 +101,9 @@ class Node {
     void startClient() {
         new Thread(() -> {
             try {
-                rmiClient.start();
-            } catch (RemoteException | NotBoundException | MalformedURLException | InterruptedException e) {
+                rmiClient.initialize();
+//                rmiClient.start();
+            } catch (RemoteException | NotBoundException | MalformedURLException /*| InterruptedException*/ e) {
                 e.printStackTrace();
             }
         }).start();

@@ -9,21 +9,20 @@ import java.rmi.RemoteException;
  */
 class RMIClient {
     private final Node parent;
-
-    RMIClient(Node parent) {
+    private RMIServerInterface rmiServer;
+    RMIClient(Node parent) throws RemoteException, NotBoundException, MalformedURLException {
         this.parent = parent;
+
     }
 
-    void transmit() {
-        System.out.println("Client " + parent.getId() + " should transmit");
+    void transmit(int electedNode, int electedNodeAptitude) throws RemoteException, InterruptedException {
+        System.out.println("Client " + parent.getId() + " transmits");
+        rmiServer.elect(electedNode, electedNodeAptitude);
     }
-
+    void initialize() throws RemoteException, NotBoundException, MalformedURLException {
+        this.rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getId() + 1) % parent.getNumberOfNodes()));
+        System.out.println("CLIENT " + parent.getId() +  ": This RMI Server is " + ((parent.getId() + 1) % parent.getNumberOfNodes()) );
+    }
     void start() throws RemoteException, NotBoundException, MalformedURLException, InterruptedException {
-        RMIServerInterface rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getId() + 1) % parent.getNumberOfNodes()));
-        while(true) {
-            System.out.println("Client " + parent.getId() + " is gonna call elect");
-            rmiServer.elect(parent.getId(), parent.getApt());
-            Thread.sleep(2000);
-        }
     }
 }

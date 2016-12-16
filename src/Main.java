@@ -1,3 +1,5 @@
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 /**
@@ -5,11 +7,11 @@ import java.rmi.RemoteException;
  * @author Fabien Salathe
  */
 public class Main {
-    public static void main(String... args) throws RemoteException {
+    public static void main(String... args) throws RemoteException, MalformedURLException, NotBoundException, InterruptedException {
 
-        Node n1 = new Node();
-        Node n2 = new Node();
-        Node n3 = new Node();
+        Node n1 = new Node(0,3);
+        Node n2 = new Node(1,3);
+        Node n3 = new Node(2,3);
 
         n1.startServer();
         n2.startServer();
@@ -24,5 +26,6 @@ public class Main {
         n1.startClient();
         n2.startClient();
         n3.startClient();
+        n1.elect(2,0);
     }
 }
