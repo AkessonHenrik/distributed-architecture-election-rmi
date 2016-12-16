@@ -5,16 +5,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class Node {
-    private int numberOfNodes = 0;
+    private static int numberOfNodes = 0;
     private final int id;
     private int apt;
     private RMIClient rmiClient;
-    private RMIServer rmiServer;
 
-    Node(int id, int numberOfNodes) throws RemoteException, MalformedURLException, NotBoundException {
-        this.id = id;
-        this.numberOfNodes = numberOfNodes;
-        this.rmiServer = new RMIServer(id, this);
+    Node() throws RemoteException, MalformedURLException, NotBoundException {
+        this.id = numberOfNodes++;
+        new RMIServer(id, this);
         this.rmiClient = new RMIClient(this);
     }
 
@@ -31,6 +29,7 @@ class Node {
         int electedNode, electedNodeAptitude;
 
         Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in node " + this.id);
+
         // Check if this node has been elected by all other nodes, full circle
         if (this.id == id) {
             rmiClient.result(this.id);

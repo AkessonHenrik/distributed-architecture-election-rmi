@@ -9,9 +9,9 @@ import java.rmi.RemoteException;
 public class Main {
     public static void main(String... args) throws RemoteException, MalformedURLException, NotBoundException, InterruptedException {
 
-        Node n1 = new Node(0,3);
-        Node n2 = new Node(1,3);
-        Node n3 = new Node(2,3);
+        Node n1 = new Node();
+        Node n2 = new Node();
+        Node n3 = new Node();
 
         // Let time for Servers to start correctly
         try {
