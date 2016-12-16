@@ -14,7 +14,7 @@ class RMIClient {
     }
 
     void transmit(int electedNode, int electedNodeAptitude) throws RemoteException, InterruptedException {
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getId() + " transmits");
+        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() + " transmits");
         rmiServer.elect(electedNode, electedNodeAptitude);
     }
 
@@ -23,7 +23,7 @@ class RMIClient {
     }
 
     void initialize() throws RemoteException, NotBoundException, MalformedURLException {
-        this.rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getId() + 1) % parent.getNumberOfNodes()));
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getId() +  ": This RMI Server is " + ((parent.getId() + 1) % parent.getNumberOfNodes()) );
+        this.rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
+        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() +  ": This RMI Server is " + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()) );
     }
 }

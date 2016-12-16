@@ -3,7 +3,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.logging.*;
 
-class Node {
+class Node extends Thread {
     private static int numberOfNodes = 0;
     private final int id;
     private int apt;
@@ -19,7 +19,7 @@ class Node {
         return numberOfNodes;
     }
 
-    int getId() {
+    int getNodeId() {
         return this.id;
     }
 
@@ -52,13 +52,12 @@ class Node {
         }
     }
 
-    void startClient() {
-        new Thread(() -> {
-            try {
-                rmiClient.initialize();
-            } catch (RemoteException | NotBoundException | MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }).start();
+    @Override
+    public void run() {
+        try {
+            rmiClient.initialize();
+        } catch (RemoteException | NotBoundException | MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 }

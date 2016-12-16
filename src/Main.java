@@ -19,9 +19,10 @@ public class Main {
             e.printStackTrace();
         }
 
-        n1.startClient();
-        n2.startClient();
-        n3.startClient();
+        n1.start();
+        n2.start();
+        n3.start();
+
         n1.elect(2,0);
     }
 }
