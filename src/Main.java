@@ -13,10 +13,7 @@ public class Main {
         Node n2 = new Node(1,3);
         Node n3 = new Node(2,3);
 
-        n1.startServer();
-        n2.startServer();
-        n3.startServer();
-
+        // Let time for Servers to start correctly
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

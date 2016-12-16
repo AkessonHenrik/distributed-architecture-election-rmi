@@ -1,6 +1,8 @@
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Node {
     private int numberOfNodes = 0;
@@ -14,15 +16,13 @@ class Node {
         this.numberOfNodes = numberOfNodes;
         this.rmiServer = new RMIServer(id, this);
         this.rmiClient = new RMIClient(this);
-        System.out.println("This id is " + id);
-        System.out.println("Current number of Nodes: " + numberOfNodes);
     }
 
-    public int getNumberOfNodes() {
+    int getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public int getId() {
+    int getId() {
         return this.id;
     }
 
@@ -30,57 +30,23 @@ class Node {
 
         int electedNode, electedNodeAptitude;
 
-        System.out.println("Elect in node " + this.id);
-
+        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in node " + this.id);
         // Check if this node has been elected by all other nodes, full circle
         if (this.id == id) {
-            electedNode = -1;
-            electedNodeAptitude = -1;
-            System.out.println("Full circle, node " + this.id + " has been elected");
+            rmiClient.result(this.id);
+            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Full circle, node " + this.id + " has been elected");
         } else {
-            if (this.apt > apt) {
-                System.out.println("NODE " + this.id + ":This apt = " + this.apt + " is > " + apt + " of node " + id);
-                System.out.println("Node " + this.id + " is elected");
+            if (this.apt > apt || this.apt == apt && this.id > id) {
+                // This node has a higher aptitude
+                Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + this.id + " is elected");
                 electedNode = this.id;
                 electedNodeAptitude = this.apt;
-                // This node has a higher aptitude
-
-                // Transmit to next node
-
                 this.apt = 0;
-
-            } else if (this.apt == apt) {
-                System.out.println("NODE " + this.id + ": This apt = " + this.apt + " is == " + apt + " of node " + id);
-                // Equal aptitudes, choice will be made according to id difference
-                if (this.id > id) {
-                    // this node is elected
-                    System.out.println("Node " + this.id + " is elected");
-
-                    // Transmit to next node
-                    electedNode = this.id;
-                    electedNodeAptitude = this.apt;
-
-                    this.apt = 0;
-                } else {
-                    // caller node is elected
-                    System.out.println("Node " + id + " is elected");
-                    electedNode = id;
-                    electedNodeAptitude = apt;
-
-                    // Transmit to next node
-
-                    this.apt++;
-                }
-
-            } else { // this.apt < apt
-                System.out.println("NODE " + this.id + ":This apt = " + this.apt + " is < " + apt + " of node " + id);
+            } else {
                 // Caller node has a higher aptitude
-                System.out.println("Node " + id + " is elected");
+                Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, id + " is elected");
                 electedNode = id;
                 electedNodeAptitude = apt;
-
-                // Transmit to next node
-
                 this.apt++;
             }
             Thread.sleep(1000);
@@ -88,28 +54,13 @@ class Node {
         }
     }
 
-    void startServer() {
-        new Thread(() -> {
-            try {
-                rmiServer.start();
-            } catch (RemoteException | MalformedURLException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
     void startClient() {
         new Thread(() -> {
             try {
                 rmiClient.initialize();
-//                rmiClient.start();
-            } catch (RemoteException | NotBoundException | MalformedURLException /*| InterruptedException*/ e) {
+            } catch (RemoteException | NotBoundException | MalformedURLException e) {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    int getApt() {
-        return apt;
     }
 }

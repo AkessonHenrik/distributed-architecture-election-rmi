@@ -2,6 +2,8 @@ import java.net.MalformedURLException;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Henrik Akesson
@@ -17,15 +19,14 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
         try {
             // /special exception handler for registry creation
             LocateRegistry.createRegistry(1099 + id);
-            System.out.println("java RMI registry created.");
         } catch (RemoteException e) {
             //do nothing, error means registry already exists
-            System.out.println("java RMI registry already exists.");
+            Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "java RMI registry already exists.");
         }
 
         // Bind this object instance to the name "RmiServer"
         Naming.rebind("localhost/RMIServer" + id, this);
-        System.out.println("PeerServer bound in registry " + "localhost/RMIServer" + id);
+        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "PeerServer bound in registry " + "localhost/RMIServer" + id);
     }
 
     @Override
@@ -36,22 +37,5 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
     @Override
     public void elect(int id, int apt) throws RemoteException, InterruptedException {
         parent.elect(id, apt);
-    }
-
-    void start() throws MalformedURLException, RemoteException {
-//        System.out.println("RMI server started");
-
-//        try {
-//            // /special exception handler for registry creation
-//            LocateRegistry.createRegistry(1099 + id);
-//            System.out.println("java RMI registry created.");
-//        } catch (RemoteException e) {
-//            //do nothing, error means registry already exists
-//            System.out.println("java RMI registry already exists.");
-//        }
-//
-//        // Bind this object instance to the name "RmiServer"
-//        Naming.rebind("localhost/RMIServer" + id, this);
-//        System.out.println("PeerServer bound in registry");
     }
 }
