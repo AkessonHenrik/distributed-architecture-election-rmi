@@ -19,12 +19,16 @@ class Node {
     // This Node's RMIClient
     private final RMIClient rmiClient;
 
-    public boolean isAnnouncing() {
-        return announcing;
+    public void setAnnouncing(boolean announcing) {
+        this.announcing = announcing;
     }
 
     // Contains whether or not this Node is announcing
     private boolean announcing;
+
+    public boolean isAnnouncing() {
+        return announcing;
+    }
 
     /**
      * Inner class used to make announces to the RMIClient, so that the calling Node can be released
@@ -114,7 +118,6 @@ class Node {
             if (!this.announcing) {
                 Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + this.id + " is elected");
                 this.announcing = true;
-                this.aptitude = 0;
                 new Thread(new AnnouncerThread(this.rmiClient, this.id, this.aptitude)).start();
             }
 
@@ -123,13 +126,12 @@ class Node {
             Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in Node " + this.id + " full circle, sending result");
 
 
-            rmiClient.result(this.id);
+            new Thread(new ResultThread(this.rmiClient, this.id)).start();
         // Caller node has a higher aptitude
         } else {
-            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, id + " is elected");
+            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node: " + this.id + " -> " + id + " is elected");
             this.announcing = true;
-            this.aptitude++;
-            new Thread(new ResultThread(this.rmiClient, this.id)).start();
+            new Thread(new AnnouncerThread(this.rmiClient, id, apt)).start();
         }
     }
 
@@ -144,8 +146,10 @@ class Node {
         this.announcing = false;
         if (this.id != resultNodeId) {
             new Thread(new ResultThread(this.rmiClient, resultNodeId)).start();
+            this.aptitude++;
         } else {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received result, I (Node " + this.id + "), have been elected");
+            this.aptitude = 0;
         }
     }
 

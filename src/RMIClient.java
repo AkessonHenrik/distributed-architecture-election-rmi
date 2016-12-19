@@ -80,8 +80,9 @@ class RMIClient implements Runnable {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    void start() throws RemoteException, InterruptedException {
+    void startElection() throws RemoteException, InterruptedException {
         Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() + " starts election process");
+        parent.setAnnouncing(true);
         this.rmiServer.elect(parent.getNodeId(), parent.getAptitude());
     }
 
@@ -93,10 +94,14 @@ class RMIClient implements Runnable {
         try {
             // Initialize the RMIServer
             initialize();
-            while (this.numberOfElectionProcesses-- > 0) {
-                Thread.sleep((long) (Math.random() * 2000));
-                // Start an election
-                this.start();
+            while (true) {
+//                System.out.println("Node " + parent.getNodeId() + " number left: " + this.numberOfElectionProcesses);
+                if (this.numberOfElectionProcesses > 0) {
+                    this.numberOfElectionProcesses--;
+                    Thread.sleep((long) (Math.random() * 2000));
+                    // Start an election
+                    this.startElection();
+                }
             }
         } catch (InterruptedException | RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();

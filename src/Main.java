@@ -13,7 +13,7 @@ import java.rmi.*;
 public class Main {
     public static void main(String... args) throws RemoteException, MalformedURLException, NotBoundException, InterruptedException {
         int numberOfElectionProcesses = Integer.parseInt(args[0]);
-
+        System.out.println("MAIN NUMBER OF ELECTION PROCESSES = " + numberOfElectionProcesses);
         // Create Nodes, which start the RMI Server
         Node n1 = new Node(numberOfElectionProcesses);
         Node n2 = new Node(numberOfElectionProcesses);
