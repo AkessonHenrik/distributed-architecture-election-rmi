@@ -115,21 +115,21 @@ class Node {
      * @throws InterruptedException
      */
     void elect(int id, int apt) throws RemoteException, InterruptedException {
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in node " + this.id);
+        System.out.println("Elect in node " + this.id);
         // This node has a higher aptitude
         if (this.aptitude > apt || this.aptitude == apt && this.id > id) {
             if (!this.announcing) {
-                Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + this.id + " is elected");
+                System.out.println("Node " + this.id + " is elected");
                 this.announcing = true;
                 new Thread(new AnnouncerThread(this.rmiClient, this.id, this.aptitude)).start();
             }
-        // Check if this node has been elected by all other nodes, full circle
+            // Check if this node has been elected by all other nodes, full circle
         } else if (this.id == id) {
-            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in Node " + this.id + " full circle, sending result");
+            System.out.println("Elect in Node " + this.id + " full circle, sending result");
             new Thread(new ResultThread(this.rmiClient, this.id)).start();
-        // Caller node has a higher aptitude
+            // Caller node has a higher aptitude
         } else {
-            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node: " + this.id + " -> " + id + " is elected");
+            System.out.println("Node: " + this.id + " -> " + id + " is elected");
             this.announcing = true;
             new Thread(new AnnouncerThread(this.rmiClient, id, apt)).start();
         }
@@ -142,13 +142,13 @@ class Node {
      * @throws RemoteException
      */
     void result(int resultNodeId) throws RemoteException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Node " + this.id + " has received result: Node " + resultNodeId + " was elected");
+        System.out.println("Node " + this.id + " has received result: Node " + resultNodeId + " was elected");
         this.announcing = false;
         if (this.id != resultNodeId) {
             new Thread(new ResultThread(this.rmiClient, resultNodeId)).start();
             this.aptitude++;
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received result, I (Node " + this.id + "), have been elected");
+            System.out.println("Received result, I (Node " + this.id + "), have been elected");
             this.aptitude = 0;
         }
     }

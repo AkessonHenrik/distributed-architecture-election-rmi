@@ -48,7 +48,7 @@ class RMIClient implements Runnable {
      * @throws InterruptedException
      */
     void announce(int electedNode, int electedNodeAptitude) throws RemoteException, InterruptedException {
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + parent.getNodeId() + " transmits");
+        System.out.println("Node " + parent.getNodeId() + " transmits");
         rmiServer.elect(electedNode, electedNodeAptitude);
     }
 
@@ -71,7 +71,7 @@ class RMIClient implements Runnable {
      */
     void initialize() throws RemoteException, NotBoundException, MalformedURLException {
         this.rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() + ": This RMI Server is " + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
+        System.out.println(parent.getNodeId() + ": This RMI Server is " + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
     }
 
     /**
@@ -81,7 +81,7 @@ class RMIClient implements Runnable {
      * @throws InterruptedException
      */
     void startElection() throws RemoteException, InterruptedException {
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() + " starts election process");
+        System.out.println(parent.getNodeId() + " starts election process");
         // Parent has to know that it is announcing
         parent.setAnnouncing(true);
         this.rmiServer.elect(parent.getNodeId(), parent.getAptitude());

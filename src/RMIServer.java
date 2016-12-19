@@ -24,12 +24,12 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
             LocateRegistry.createRegistry(1099 + id);
         } catch (RemoteException e) {
             //do nothing, error means registry already exists
-            Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "java RMI registry already exists.");
+            System.out.println("java RMI registry already exists.");
         }
 
         // Bind this object instance to the name "RmiServer"
         Naming.rebind("localhost/RMIServer" + id, this);
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "PeerServer bound in registry " + "localhost/RMIServer" + id);
+        System.out.println("PeerServer bound in registry " + "localhost/RMIServer" + id);
     }
 
     @Override
