@@ -5,10 +5,14 @@ import java.rmi.registry.*;
 import java.util.logging.*;
 
 /**
+ * RMIServer exposes methods that clients can call through RMI.
+ * intercepts calls and forwards them to the parent Node
+ *
  * @author Henrik Akesson
  * @author Fabien Salathe
  */
 public class RMIServer extends UnicastRemoteObject implements RMIServerInterface {
+
     private Node parent;
 
     RMIServer(Node parent) throws RemoteException, MalformedURLException {
