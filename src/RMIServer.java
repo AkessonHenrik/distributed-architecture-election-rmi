@@ -5,31 +5,42 @@ import java.rmi.registry.*;
 import java.util.logging.*;
 
 /**
+ * RMIServer exposes methods that clients can call through RMI.
+ * intercepts calls and forwards them to the parent Node
+ *
  * @author Henrik Akesson
  * @author Fabien Salathe
  */
 public class RMIServer extends UnicastRemoteObject implements RMIServerInterface {
-    private int id;
+
     private Node parent;
 
-    RMIServer(int id, Node parent) throws RemoteException, MalformedURLException {
-        this.id = id;
+    RMIServer(Node parent) throws RemoteException, MalformedURLException {
+
         this.parent = parent;
+        int id = parent.getNodeId();
         try {
             // /special exception handler for registry creation
             LocateRegistry.createRegistry(1099 + id);
         } catch (RemoteException e) {
             //do nothing, error means registry already exists
-            Logger.getLogger(this.getClass().getSimpleName()).log(Level.WARNING, "java RMI registry already exists.");
+            System.out.println("java RMI registry already exists.");
         }
 
         // Bind this object instance to the name "RmiServer"
         Naming.rebind("localhost/RMIServer" + id, this);
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "PeerServer bound in registry " + "localhost/RMIServer" + id);
+        System.out.println("PeerServer bound in registry " + "localhost/RMIServer" + id);
     }
 
     @Override
     public void elect(int id, int apt) throws RemoteException, InterruptedException {
+        // Signal to parent that an election announcement has been made
         parent.elect(id, apt);
+    }
+
+    @Override
+    public void result(int electedNodeId) throws RemoteException {
+        // Signal to parent that a result announcement has been made
+        this.parent.result(electedNodeId);
     }
 }
