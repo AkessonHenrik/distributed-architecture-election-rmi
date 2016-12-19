@@ -6,15 +6,17 @@ import java.util.logging.*;
 class Node extends Thread {
     private static int numberOfNodes = 0;
     private final int id;
+    private int numberOfElectionProcesses;
     private int aptitude;
     private RMIClient rmiClient;
     private boolean announcing;
 
-    Node() throws RemoteException, MalformedURLException, NotBoundException {
+    Node(int numberOfElectionProcesses) throws RemoteException, MalformedURLException, NotBoundException {
         this.id = numberOfNodes++;
         this.announcing = false;
         new RMIServer(id, this);
         this.rmiClient = new RMIClient(this);
+        this.numberOfElectionProcesses = numberOfElectionProcesses;
     }
 
     int getNumberOfNodes() {
@@ -74,18 +76,14 @@ class Node extends Thread {
     public void run() {
         try {
             rmiClient.initialize();
-        } catch (RemoteException | NotBoundException | MalformedURLException e) {
-            e.printStackTrace();
-        }
-        while (true) {
-            try {
-                Thread.sleep((long) (Math.random()*2000));
+            while (this.numberOfElectionProcesses-- > 0) {
+                Thread.sleep((long) (Math.random() * 2000));
                 if (Math.random() < 0.3) {
                     this.rmiClient.start();
                 }
-            } catch (InterruptedException | RemoteException e) {
-                e.printStackTrace();
             }
+        } catch (InterruptedException | RemoteException | NotBoundException | MalformedURLException e) {
+            e.printStackTrace();
         }
     }
 }
