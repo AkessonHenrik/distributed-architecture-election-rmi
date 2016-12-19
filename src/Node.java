@@ -148,7 +148,7 @@ class Node {
             new Thread(new ResultThread(this.rmiClient, resultNodeId)).start();
             this.aptitude++;
         } else {
-            System.out.println("Received result, I (Node " + this.id + "), have been elected");
+            System.out.println("Received result, I (Node " + this.id + "), have been elected\n");
             this.aptitude = 0;
         }
     }
