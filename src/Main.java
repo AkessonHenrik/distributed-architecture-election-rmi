@@ -23,6 +23,5 @@ public class Main {
         n2.start();
         n3.start();
 
-        n1.elect(2,0);
     }
 }

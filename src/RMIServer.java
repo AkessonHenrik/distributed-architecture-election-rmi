@@ -32,4 +32,9 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
     public void elect(int id, int apt) throws RemoteException, InterruptedException {
         parent.elect(id, apt);
     }
+
+    @Override
+    public void result(int electedNodeId) throws RemoteException {
+        this.parent.result(electedNodeId);
+    }
 }

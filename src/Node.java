@@ -6,11 +6,13 @@ import java.util.logging.*;
 class Node extends Thread {
     private static int numberOfNodes = 0;
     private final int id;
-    private int apt;
+    private int aptitude;
     private RMIClient rmiClient;
+    private boolean announcing;
 
     Node() throws RemoteException, MalformedURLException, NotBoundException {
         this.id = numberOfNodes++;
+        this.announcing = false;
         new RMIServer(id, this);
         this.rmiClient = new RMIClient(this);
     }
@@ -23,32 +25,48 @@ class Node extends Thread {
         return this.id;
     }
 
+    int getAptitude() {
+        return this.aptitude;
+    }
+
     void elect(int id, int apt) throws RemoteException, InterruptedException {
 
         int electedNode, electedNodeAptitude;
 
         Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in node " + this.id);
 
-        // Check if this node has been elected by all other nodes, full circle
-        if (this.id == id) {
-            rmiClient.result(this.id);
-            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Full circle, node " + this.id + " has been elected");
-        } else {
-            if (this.apt > apt || this.apt == apt && this.id > id) {
-                // This node has a higher aptitude
+        if (this.aptitude > apt || this.aptitude == apt && this.id > id) {
+            // This node has a higher aptitude
+            if (!this.announcing) {
                 Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + this.id + " is elected");
                 electedNode = this.id;
-                electedNodeAptitude = this.apt;
-                this.apt = 0;
-            } else {
-                // Caller node has a higher aptitude
-                Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, id + " is elected");
-                electedNode = id;
-                electedNodeAptitude = apt;
-                this.apt++;
+                electedNodeAptitude = this.aptitude;
+                this.announcing = true;
+                this.aptitude = 0;
+                this.rmiClient.announce(electedNode, electedNodeAptitude);
             }
-            Thread.sleep(100);
-            this.rmiClient.transmit(electedNode, electedNodeAptitude);
+            // Check if this node has been elected by all other nodes, full circle
+        } else if (this.id == id) {
+            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in Node " + this.id + " full circle, sending result");
+            rmiClient.result(this.id);
+        } else {
+            // Caller node has a higher aptitude
+            Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, id + " is elected");
+            electedNode = id;
+            electedNodeAptitude = apt;
+            this.announcing = true;
+            this.aptitude++;
+            this.rmiClient.announce(electedNode, electedNodeAptitude);
+        }
+    }
+
+    void result(int resultNodeId) throws RemoteException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Node " + this.id + " has received result: Node " + resultNodeId + " was elected");
+        this.announcing = false;
+        if (this.id != resultNodeId) {
+            rmiClient.result(resultNodeId);
+        } else {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received result, I (Node " + this.id + ")have been elected");
         }
     }
 
@@ -58,6 +76,16 @@ class Node extends Thread {
             rmiClient.initialize();
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
             e.printStackTrace();
+        }
+        while (true) {
+            try {
+                Thread.sleep(2000);
+                if (Math.random() < 0.3) {
+                    this.rmiClient.start();
+                }
+            } catch (InterruptedException | RemoteException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

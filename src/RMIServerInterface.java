@@ -6,4 +6,5 @@ import java.rmi.*;
  */
 public interface RMIServerInterface extends Remote {
     void elect(int id, int apt) throws RemoteException, InterruptedException;
+    void result(int electedNodeId) throws RemoteException;
 }
