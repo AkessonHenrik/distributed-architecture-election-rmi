@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.logging.*;
 
 /**
- * The Node class contains all election logic and handles the RMIServer and RMIClient
+ * The Node class contains all election logic and handles the RMIServer and RMIClient creation and message forwarding
  *
  * @author Henrik Akesson
  * @author Fabien Salathe
@@ -18,16 +18,28 @@ class Node {
     private int aptitude;
     // This Node's RMIClient
     private final RMIClient rmiClient;
-
-    public void setAnnouncing(boolean announcing) {
-        this.announcing = announcing;
-    }
-
     // Contains whether or not this Node is announcing
     private boolean announcing;
 
-    public boolean isAnnouncing() {
-        return announcing;
+    int getNumberOfNodes() {
+        return numberOfNodes;
+    }
+
+    int getNodeId() {
+        return this.id;
+    }
+
+    int getAptitude() {
+        return this.aptitude;
+    }
+
+    /**
+     * Allows the RMIClient to signal this Node that it is announcing
+     *
+     * @param announcing
+     */
+    void setAnnouncing(boolean announcing) {
+        this.announcing = announcing;
     }
 
     /**
@@ -88,44 +100,32 @@ class Node {
         this.rmiClient = new RMIClient(this, numberOfElectionProcesses);
     }
 
-    int getNumberOfNodes() {
-        return numberOfNodes;
-    }
-
-    int getNodeId() {
-        return this.id;
-    }
-
-    int getAptitude() {
-        return this.aptitude;
-    }
-
     /**
      * Handles the election choice and forwards the result to the RMIClient.
      * Based on the provided Ring election algorithm
+     *
+     * If this Node's aptitude is greater than or equal but this Node's id is greater than the caller's, this Node is elected
+     * Otherwise, the caller is elected
+     *
+     * If the received elected Node is this one, the election process stops and the result announcement process starts
+     *
      * @param id Caller Node's forwarded Node id
      * @param apt Caller Node's forwarded Node aptitude
      * @throws RemoteException
      * @throws InterruptedException
      */
     void elect(int id, int apt) throws RemoteException, InterruptedException {
-
         Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in node " + this.id);
-
         // This node has a higher aptitude
         if (this.aptitude > apt || this.aptitude == apt && this.id > id) {
-
             if (!this.announcing) {
                 Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + this.id + " is elected");
                 this.announcing = true;
                 new Thread(new AnnouncerThread(this.rmiClient, this.id, this.aptitude)).start();
             }
-
         // Check if this node has been elected by all other nodes, full circle
         } else if (this.id == id) {
             Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Elect in Node " + this.id + " full circle, sending result");
-
-
             new Thread(new ResultThread(this.rmiClient, this.id)).start();
         // Caller node has a higher aptitude
         } else {
@@ -156,7 +156,7 @@ class Node {
     /**
      * Starts the RMIClient thread
      */
-    public void startClient() {
+    void startClient() {
         new Thread(rmiClient).start();
     }
 }

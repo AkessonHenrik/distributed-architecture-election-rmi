@@ -82,6 +82,7 @@ class RMIClient implements Runnable {
      */
     void startElection() throws RemoteException, InterruptedException {
         Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() + " starts election process");
+        // Parent has to know that it is announcing
         parent.setAnnouncing(true);
         this.rmiServer.elect(parent.getNodeId(), parent.getAptitude());
     }
@@ -95,9 +96,9 @@ class RMIClient implements Runnable {
             // Initialize the RMIServer
             initialize();
             while (true) {
-//                System.out.println("Node " + parent.getNodeId() + " number left: " + this.numberOfElectionProcesses);
                 if (this.numberOfElectionProcesses > 0) {
                     this.numberOfElectionProcesses--;
+                    // Sleep an amount of time between 0 and 2 seconds
                     Thread.sleep((long) (Math.random() * 2000));
                     // Start an election
                     this.startElection();
