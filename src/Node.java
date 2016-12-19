@@ -79,7 +79,7 @@ class Node extends Thread {
         }
         while (true) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep((long) (Math.random()*2000));
                 if (Math.random() < 0.3) {
                     this.rmiClient.start();
                 }
