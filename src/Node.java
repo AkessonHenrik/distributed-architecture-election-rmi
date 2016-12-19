@@ -8,13 +8,13 @@ class Node extends Thread {
     private final int id;
     private int numberOfElectionProcesses;
     private int aptitude;
-    private RMIClient rmiClient;
+    private final RMIClient rmiClient;
     private boolean announcing;
 
     Node(int numberOfElectionProcesses) throws RemoteException, MalformedURLException, NotBoundException {
         this.id = numberOfNodes++;
         this.announcing = false;
-        new RMIServer(id, this);
+        new RMIServer(this);
         this.rmiClient = new RMIClient(this);
         this.numberOfElectionProcesses = numberOfElectionProcesses;
     }
@@ -68,7 +68,7 @@ class Node extends Thread {
         if (this.id != resultNodeId) {
             rmiClient.result(resultNodeId);
         } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received result, I (Node " + this.id + ")have been elected");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received result, I (Node " + this.id + "), have been elected");
         }
     }
 
@@ -78,9 +78,7 @@ class Node extends Thread {
             rmiClient.initialize();
             while (this.numberOfElectionProcesses-- > 0) {
                 Thread.sleep((long) (Math.random() * 2000));
-                if (Math.random() < 0.3) {
-                    this.rmiClient.start();
-                }
+                this.rmiClient.start();
             }
         } catch (InterruptedException | RemoteException | NotBoundException | MalformedURLException e) {
             e.printStackTrace();

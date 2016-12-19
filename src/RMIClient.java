@@ -14,11 +14,9 @@ class RMIClient {
     }
 
     void announce(int electedNode, int electedNodeAptitude) throws RemoteException, InterruptedException {
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getNodeId() + " transmits");
+        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Node " + parent.getNodeId() + " transmits");
         rmiServer.elect(electedNode, electedNodeAptitude);
     }
-
-
 
     void result(int electedNode) throws RemoteException {
         this.rmiServer.result(electedNode);

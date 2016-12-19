@@ -9,12 +9,12 @@ import java.util.logging.*;
  * @author Fabien Salathe
  */
 public class RMIServer extends UnicastRemoteObject implements RMIServerInterface {
-    private int id;
     private Node parent;
 
-    RMIServer(int id, Node parent) throws RemoteException, MalformedURLException {
-        this.id = id;
+    RMIServer(Node parent) throws RemoteException, MalformedURLException {
+
         this.parent = parent;
+        int id = parent.getNodeId();
         try {
             // /special exception handler for registry creation
             LocateRegistry.createRegistry(1099 + id);
