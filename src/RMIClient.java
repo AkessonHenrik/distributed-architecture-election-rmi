@@ -24,6 +24,6 @@ class RMIClient {
 
     void initialize() throws RemoteException, NotBoundException, MalformedURLException {
         this.rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getId() + 1) % parent.getNumberOfNodes()));
-        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, parent.getId() +  ": This RMI Server is " + ((parent.getId() + 1) % parent.getNumberOfNodes()) );
+        Logger.getLogger(this.getClass().getSimpleName()).log(Level.INFO, "Client " + parent.getId() +  ": This RMI Server is " + ((parent.getId() + 1) % parent.getNumberOfNodes()) );
     }
 }
