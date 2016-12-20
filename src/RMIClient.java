@@ -25,11 +25,16 @@ class RMIClient implements Runnable {
     private int numberOfElectionProcesses;
 
     /**
+     * RMI host address
+     */
+    private final String host = "localhost";
+
+    /**
      * Only constructor, needs a parent Node for information and a number
      * of election processes to run
      *
-     * @param parent
-     * @param numberOfElectionProcesses
+     * @param parent                    Parent node
+     * @param numberOfElectionProcesses number of elections to start
      * @throws RemoteException
      * @throws NotBoundException
      * @throws MalformedURLException
@@ -42,8 +47,8 @@ class RMIClient implements Runnable {
     /**
      * Method used to announce an election to the next node
      *
-     * @param electedNode
-     * @param electedNodeAptitude
+     * @param electedNode         Elected Node
+     * @param electedNodeAptitude Elected Node's aptitude
      * @throws RemoteException
      * @throws InterruptedException
      */
@@ -55,7 +60,7 @@ class RMIClient implements Runnable {
     /**
      * Method used to announce a result to the next node
      *
-     * @param electedNode
+     * @param electedNode Elected Node
      * @throws RemoteException
      */
     void result(int electedNode) throws RemoteException {
@@ -69,8 +74,8 @@ class RMIClient implements Runnable {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    void initialize() throws RemoteException, NotBoundException, MalformedURLException {
-        this.rmiServer = (RMIServerInterface) Naming.lookup("localhost/RMIServer" + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
+    private void initialize() throws RemoteException, NotBoundException, MalformedURLException {
+        this.rmiServer = (RMIServerInterface) Naming.lookup(this.host + "/RMIServer" + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
         System.out.println(parent.getNodeId() + ": This RMI Server is " + ((parent.getNodeId() + 1) % parent.getNumberOfNodes()));
     }
 
@@ -80,7 +85,7 @@ class RMIClient implements Runnable {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    void startElection() throws RemoteException, InterruptedException {
+    private void startElection() throws RemoteException, InterruptedException {
         System.out.println(parent.getNodeId() + " starts election process");
         // Parent has to know that it is announcing
         parent.setAnnouncing(true);

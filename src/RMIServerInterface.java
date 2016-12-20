@@ -11,8 +11,8 @@ public interface RMIServerInterface extends Remote {
     /**
      * The implementation of this method will contain the election steps, excluding result transmission and handling
      *
-     * @param id
-     * @param apt
+     * @param id  node id to run the election algorithm with
+     * @param apt node aptitude to run the election algorithm with
      * @throws RemoteException
      * @throws InterruptedException
      */
@@ -21,7 +21,7 @@ public interface RMIServerInterface extends Remote {
     /**
      * The implementation of this method will contain the result processing
      *
-     * @param electedNodeId
+     * @param electedNodeId the node that's elected
      * @throws RemoteException
      */
     void result(int electedNodeId) throws RemoteException;

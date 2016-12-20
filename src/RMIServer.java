@@ -15,6 +15,18 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
 
     private Node parent;
 
+    /**
+     * RMI Host address
+     */
+    private final String host = "localhost";
+
+    /**
+     * RMIServer constructor
+     *
+     * @param parent parent node
+     * @throws RemoteException
+     * @throws MalformedURLException
+     */
     RMIServer(Node parent) throws RemoteException, MalformedURLException {
 
         this.parent = parent;
@@ -28,16 +40,30 @@ public class RMIServer extends UnicastRemoteObject implements RMIServerInterface
         }
 
         // Bind this object instance to the name "RmiServer"
-        Naming.rebind("localhost/RMIServer" + id, this);
+        Naming.rebind(this.host + "/RMIServer" + id, this);
         System.out.println("PeerServer bound in registry " + "localhost/RMIServer" + id);
     }
 
+    /**
+     * Exposed method for RMI election
+     *
+     * @param id  forwarded elected node
+     * @param apt forwarded elected node aptitude
+     * @throws RemoteException
+     * @throws InterruptedException
+     */
     @Override
     public void elect(int id, int apt) throws RemoteException, InterruptedException {
         // Signal to parent that an election announcement has been made
         parent.elect(id, apt);
     }
 
+    /**
+     * Exposed method for result announcing
+     *
+     * @param electedNodeId Result Node
+     * @throws RemoteException
+     */
     @Override
     public void result(int electedNodeId) throws RemoteException {
         // Signal to parent that a result announcement has been made

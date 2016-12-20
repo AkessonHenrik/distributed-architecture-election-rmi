@@ -48,6 +48,7 @@ class Node {
     private class AnnouncerThread implements Runnable {
         RMIClient rmiClient;
         int id, aptitude;
+
         AnnouncerThread(RMIClient rmiClient, int id, int aptitude) {
             this.rmiClient = rmiClient;
             this.id = id;
@@ -71,10 +72,12 @@ class Node {
 
         private RMIClient rmiClient;
         private int id;
+
         ResultThread(RMIClient rmiClient, int id) {
             this.rmiClient = rmiClient;
             this.id = id;
         }
+
         @Override
         public void run() {
             try {
@@ -88,7 +91,7 @@ class Node {
     /**
      * Constructor. Needs the number of election processes the client should start
      *
-     * @param numberOfElectionProcesses
+     * @param numberOfElectionProcesses number of elections to start
      * @throws RemoteException
      * @throws MalformedURLException
      * @throws NotBoundException
@@ -103,13 +106,13 @@ class Node {
     /**
      * Handles the election choice and forwards the result to the RMIClient.
      * Based on the provided Ring election algorithm
-     *
+     * <p>
      * If this Node's aptitude is greater than or equal but this Node's id is greater than the caller's, this Node is elected
      * Otherwise, the caller is elected
-     *
+     * <p>
      * If the received elected Node is this one, the election process stops and the result announcement process starts
      *
-     * @param id Caller Node's forwarded Node id
+     * @param id  Caller Node's forwarded Node id
      * @param apt Caller Node's forwarded Node aptitude
      * @throws RemoteException
      * @throws InterruptedException
